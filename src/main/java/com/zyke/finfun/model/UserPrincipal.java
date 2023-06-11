@@ -1,4 +1,4 @@
-package com.zyke.finfun.auth;
+package com.zyke.finfun.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

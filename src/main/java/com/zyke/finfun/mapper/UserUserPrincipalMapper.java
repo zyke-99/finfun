@@ -1,10 +1,12 @@
-package com.zyke.finfun.utils;
+package com.zyke.finfun.mapper;
 
-import com.zyke.finfun.auth.UserPrincipal;
+import com.zyke.finfun.model.UserPrincipal;
 import com.zyke.finfun.model.User;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 
+@Component
 public class UserUserPrincipalMapper implements ObjectMapper<User, UserPrincipal> {
 
     @Override

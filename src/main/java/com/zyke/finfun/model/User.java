@@ -1,19 +1,25 @@
 package com.zyke.finfun.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+//TODO: clean up some of the annotations
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
+    // using id even though email is unique
+    // queries are usually more efficient joining on numeric types
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "email", unique = true)

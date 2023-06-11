@@ -1,4 +1,4 @@
-package com.zyke.finfun.utils;
+package com.zyke.finfun.mapper;
 
 public interface ObjectMapper<T, U> {
 

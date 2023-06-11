@@ -1,6 +1,6 @@
 package com.zyke.finfun.config;
 
-import com.zyke.finfun.auth.JwtAuthFilter;
+import com.zyke.finfun.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,8 @@ public class SecurityConfig {
         http.csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("")
+                .requestMatchers(request -> request.getRequestURI().matches("/api/v[0-9]+/authenticate") ||
+                        request.getRequestURI().matches("/api/v[0-9]+/register"))
                 .permitAll()
                 .anyRequest()
                 .authenticated()

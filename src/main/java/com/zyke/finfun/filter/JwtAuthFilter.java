@@ -1,6 +1,6 @@
-package com.zyke.finfun.auth;
+package com.zyke.finfun.filter;
 
-import com.zyke.finfun.repository.UserRepository;
+import com.zyke.finfun.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,7 +21,10 @@ import java.io.IOException;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Autowired
-    UserRepository userRepository;
+    JwtService jwtService;
+
+    @Autowired
+    UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -34,21 +37,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String jwt = authHeader.substring(7);
+        final var jwt = authHeader.substring(7);
+        final var userEmail = jwtService.extractUsername(jwt);
 
-        //TODO: fetch user details and build token based on them
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    null,
-                    null,
-                    null
-            );
+            final var userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-            authToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+
+                final var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, null);
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
         }
         filterChain.doFilter(request, response);
     }
